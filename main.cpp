@@ -207,6 +207,6 @@ int main(){
 	PrintTable(3);
 	cout<<"\n\n\n";
 	PrintTable(4);
-
+	
 	return 0;
 }
