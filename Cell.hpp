@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "all.hpp"
 using namespace std;
 
 const int ROW_TABLE=40;
@@ -12,11 +13,12 @@ enum _pos_{vertical,horizontal,zero};
 
 class Cell{
 public:
-	explicit Cell(char value,__status__ status=freely,_pos_ pos=zero,char print='@'):
+	explicit Cell(char value,__status__ status=freely,_pos_ pos=zero,char print='@',Word word={-1,"0","0","0","0"}):
 			status_(status),
 			value_(value),
 			pos_(pos),
-			print_(print){}
+			print_(print),
+			word_(word){}
 	Cell():
 			status_(freely),
 			value_('0'),
@@ -35,6 +37,7 @@ public:
 	void setCol(int x){col_=x;}
 	int Row()const{return row_;}
 	int Col()const{return col_;}
+	Word getWord()const{return word_;}
 private:
 	int row_;
 	int col_;
@@ -42,13 +45,15 @@ private:
 	char print_;
 	__status__ status_;
 	_pos_ pos_;
+	Word word_;
 };
 ostream & operator<<(ostream &x,Cell const &cell){
 	x<<cell.Value();
 	return x;
 }
 
-Cell SetCell(char str,__status__ status,_pos_ pos,char print){
-	Cell cell(str, status,pos,print);
+Cell SetCell(char str,__status__ status,_pos_ pos,char print,Word word){
+	Cell cell(str, status,pos,print,word);
 	return cell;
 }
+

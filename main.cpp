@@ -1,8 +1,8 @@
 #include "Cell.hpp"
-#include "all.hpp"
+// #include "all.hpp"
 #include <ctime>	//time
 #include <cstdlib>	//rand srand
-
+#include <iomanip> //std::setw(3)
 //SetCell(char str,__status__ status,_pos_ pos,char print)
 Cell table[ROW_TABLE][COL_TABLE];
 void PrintTable(int flag=0){
@@ -21,8 +21,13 @@ void PrintTable(int flag=0){
 			else if(flag==3){
 				char i=table[row][col].Print();
 				cout<<i<<" ";
-
-
+			}
+			else if(flag==4){
+				char i=table[row][col].Print();
+				if(i=='*'){
+					string i=to_string(table[row][col].getWord().id);
+					cout<<std::setfill ('x')<<std::setw(3)<<i;
+				}else{cout<<std::setfill (i)<<std::setw(3)<<i;}
 			}
 			else{cout<<table[row][col]<<" ";}
 			
@@ -60,17 +65,17 @@ bool CanISetWord(int row,int col,string word,_pos_ pos,int collaps=-1){
 	}
 }
 
-void SetInTable(int row,int col,string word,_pos_ pos){
+void SetInTable(int row,int col,string word,_pos_ pos,Word ClassWord){
 	if(pos==vertical){
 		for(int i=0;i!=word.size();i++){
-			if(i==0){table[row+i][col]=SetCell(word[i],wordHere,pos,'*');continue;}
-			table[row+i][col]=SetCell(word[i],wordHere,pos,' ');
+			if(i==0){table[row+i][col]=SetCell(word[i],wordHere,pos,'*',ClassWord);continue;}
+			table[row+i][col]=SetCell(word[i],wordHere,pos,' ',ClassWord);
 		}
 	}
 	else if(pos==horizontal){
 		for(int i=0;i!=word.size();i++){
-			if(i==0){table[row][col+i]=SetCell(word[i],wordHere,pos,'*'); continue;}
-			table[row][col+i]=SetCell(word[i],wordHere,pos,' ');
+			if(i==0){table[row][col+i]=SetCell(word[i],wordHere,pos,'*',ClassWord); continue;}
+			table[row][col+i]=SetCell(word[i],wordHere,pos,' ',ClassWord);
 		}
 	}
 }
@@ -80,18 +85,18 @@ void SetBlock(int row, int col,string word,_pos_ pos){
 		//Перед словом по вертикали
 		if(NOTInTable(row)){return;}
 		if(NOTInTable(col-1)){return;}
-		table[row][col-1]=SetCell('#',block,zero,'#');
+		table[row][col-1]=SetCell('#',block,zero,'#',getBlockWord());
 		//за словом по вертикали
 		if(NOTInTable(col+word.size())){return;}
-		table[row][col+word.size()]=SetCell('#',block,zero,'#');
+		table[row][col+word.size()]=SetCell('#',block,zero,'#',getBlockWord());
 	}else if(pos==vertical){
 		//над словом
 		if(NOTInTable(row-1)){return;}
 		if(NOTInTable(col)){return;}
-		table[row-1][col]=SetCell('#',block,zero,'#');
+		table[row-1][col]=SetCell('#',block,zero,'#',getBlockWord());
 		//под словом
 		if(NOTInTable(row+word.size())){return;}
-		table[row+word.size()][col]=SetCell('#',block,zero,'#');
+		table[row+word.size()][col]=SetCell('#',block,zero,'#',getBlockWord());
 	}
 }	
 
@@ -107,7 +112,7 @@ void IfNeedBlock(){
 				if(!NOTInTable((row+1))){if(table[row+1][col].Status()==wordHere){sum+=1;}}
 				if(!NOTInTable(row-1)){if(table[row-1][col].Status()==wordHere){sum+=1;}}
 				if(sum>1){
-					*cell=SetCell('#',block,zero,'#');
+					*cell=SetCell('#',block,zero,'#',getBlockWord());
 				}
 			}
 		}
@@ -174,10 +179,11 @@ int main(){
 	random_shuffle ( ListWord.end()-11, ListWord.end(),[](int i) {return std::rand()%i;});
 	}//Конец сортировки больших слов.
 	/*Region вставляем первое слово по середине*/{
-	string FirstWord=ListWord.back().eng;
+	Word fword=ListWord.back();
+	string FirstWord=fword.eng;
 	ListWord.pop_back();
 	if(CanISetWord(ROW_TABLE/2,(COL_TABLE/2)-(FirstWord.size()/2),FirstWord,horizontal)){
-		SetInTable(ROW_TABLE/2,(COL_TABLE/2)-(FirstWord.size()/2),FirstWord,horizontal);
+		SetInTable(ROW_TABLE/2,(COL_TABLE/2)-(FirstWord.size()/2),FirstWord,horizontal,fword);
 		SetBlock(ROW_TABLE/2, (COL_TABLE/2)-(FirstWord.size()/2),FirstWord,horizontal);
 	}else{
 		cout<<"Не хватило места для первого же слова."<<endl;
@@ -189,7 +195,7 @@ int main(){
 	for(int i=ListWord.size()-1;/*i!=ListWord.size()-5*/ i!=0;--i){
 		string word=ListWord[i].eng;
 		if(FindIndex(&row,&col,word,&pos)){
-			SetInTable(row,col,word,pos);
+			SetInTable(row,col,word,pos,ListWord[i]);
 			SetBlock(row,col,word,pos);
 			IfNeedBlock();
 		}
@@ -199,5 +205,8 @@ int main(){
 	PrintTable(2);
 	cout<<"\n\n\n";
 	PrintTable(3);
+	cout<<"\n\n\n";
+	PrintTable(4);
+
 	return 0;
 }

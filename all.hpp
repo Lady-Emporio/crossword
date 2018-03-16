@@ -11,3 +11,7 @@ struct Word{
 };
 std::vector<Word> getWord();
 
+inline Word getBlockWord(){
+	Word word={-1,"#","#","#","#"};
+	return word;
+}
